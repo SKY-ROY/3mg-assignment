@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -7,12 +8,14 @@ public class ItemDistributor : MonoBehaviour
 
     private bool playerInside = false;
 
+    public Action OnItemSpawn;
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag(playerTag))
         {
             playerInside = true;
-            StartCoroutine(StartTiming());
+            StartCoroutine(StartTiming(1f));
         }
     }
 
@@ -21,23 +24,22 @@ public class ItemDistributor : MonoBehaviour
         if (other.gameObject.CompareTag(playerTag))
         {
             playerInside = false;
-            StopCoroutine(StartTiming());
+            StopCoroutine(StartTiming(1f));
         }
     }
 
-    private IEnumerator StartTiming()
+    private IEnumerator StartTiming(float interval)
     {
         float timer = 0f;
 
         while (playerInside)
         {
-            timer += Time.deltaTime;
-            if (timer >= 1f)
-            {
-                Debug.Log("Time: " + Time.time);
-                timer = 0f;
-            }
-            yield return null;
+            timer += interval;
+            Debug.Log("Time: " + timer);
+
+            OnItemSpawn?.Invoke();
+
+            yield return new WaitForSeconds(interval);
         }
     }
 }

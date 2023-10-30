@@ -52,12 +52,12 @@ public class Player : MonoBehaviour
 
     private void OnEnable()
     {
-        playerController.OnInteract += ItemInteractionHandler;
+        // playerController.OnInteract += ItemInteractionHandler;
     }
 
     private void OnDisable()
     {
-        playerController.OnInteract -= ItemInteractionHandler;
+        // playerController.OnInteract -= ItemInteractionHandler;
 
         // Transition to the Inactive state
         ChangeState(PlayerState.Inactive);
@@ -76,6 +76,26 @@ public class Player : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         NotificationManager.Instance.ShowNotification("Press 'F' to interact!");
+
+        ItemDistributor itemDistributor = other.gameObject.GetComponent<ItemDistributor>();
+        if (itemDistributor != null)
+        {
+            itemDistributor.OnItemSpawn += ItemDistributionSpawnHandler;
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        ItemDistributor itemDistributor = other.gameObject.GetComponent<ItemDistributor>();
+        if (itemDistributor != null)
+        {
+            itemDistributor.OnItemSpawn -= ItemDistributionSpawnHandler;
+        }
+    }
+
+    private void ItemDistributionSpawnHandler()
+    {
+        Debug.Log($"Item Spawn Recorded");
     }
 
     private void ItemInteractionHandler(GameObject obj)
