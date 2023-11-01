@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class InputController : MonoBehaviour
 {
+    [SerializeField] bool useKeyboard = false;
+    [SerializeField] VariableJoystick variableJoystick;
+
     // Define events for various actions
     public event Action<float> OnMoveForward;
     public event Action<float> OnMoveBackward;
@@ -18,6 +21,7 @@ public class InputController : MonoBehaviour
     public event Action<Weapon> OnWeaponDrop;
     public event Action OnPrimaryFire;
     public event Action<float> OnRotateHorizontal;
+    public Action<float, float> OnHorizontalMovement;
 
     [SerializeField] float rotationSensitivity = 2.0f; // Adjust this value to control the rotation speed
 
@@ -37,27 +41,12 @@ public class InputController : MonoBehaviour
     private void Update()
     {
         // Get input values for movement
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
+        float horizontalInput = useKeyboard ? Input.GetAxis("Horizontal") : variableJoystick.Horizontal;
+        float verticalInput = useKeyboard ? Input.GetAxis("Vertical") : variableJoystick.Vertical;
 
-        // Check for movement events
-        if (verticalInput > 0)
-        {
-            OnMoveForward?.Invoke(verticalInput);
-        }
-        else if (verticalInput < 0)
-        {
-            OnMoveBackward?.Invoke(-verticalInput); // Pass positive value for backward movement
-        }
+        // Debug.Log($"Movement Input Captured. ({horizontalInput}, {verticalInput})");
+        OnHorizontalMovement?.Invoke(horizontalInput, verticalInput);
 
-        if (horizontalInput > 0)
-        {
-            OnMoveRight?.Invoke(horizontalInput);
-        }
-        else if (horizontalInput < 0)
-        {
-            OnMoveLeft?.Invoke(-horizontalInput); // Pass positive value for left movement
-        }
 
         // Check for jump event
         if (Input.GetButtonDown("Jump"))

@@ -13,6 +13,7 @@ public class BaseItem : MonoBehaviour
     public string ItemDescription => itemDescription;
     // [SerializeField] GameObject itemViewHandlerObject;
     // public GameObject ItemViewHandlerObject => itemViewHandlerObject;
+
     [SerializeField] Sprite itemIcon;
     public Sprite ItemIcon => itemIcon;
 

@@ -8,14 +8,14 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject weaponHolder;
     [SerializeField] GameObject itemHolder;
 
-    private PlayerController playerController;
+    private PlayerMovementController playerController;
     private Backpack backpack; // Reference to the player's backpack
-
-    // Use camelCase naming convention for variables
+    public Backpack BackPack => backpack;
     private PlayerState currentState;
 
     // Event to notify about player state changes
     public event Action<PlayerState> OnPlayerStateChanged;
+    public event Action<PlayerMovementState> OnPlayerMovementStateChanged;
 
     private void Awake()
     {
@@ -28,7 +28,7 @@ public class Player : MonoBehaviour
         ChangeState(PlayerState.Initializing);
 
         // Get the PlayerController and PlayerController components
-        playerController = GetComponent<PlayerController>();
+        playerController = GetComponent<PlayerMovementController>();
 
         if (playerController == null)
         {
@@ -41,23 +41,23 @@ public class Player : MonoBehaviour
         }
 
         // Find and initialize the player's backpack
-        // backpack = GetComponent<Backpack>();
-        // if (backpack == null)
-        // {
-        //     Debug.LogError("Backpack component not found on the same GameObject.");
-        // }
+        backpack = backpackHolder.GetComponent<Backpack>();
+        if (backpack == null)
+        {
+            Debug.LogError("Backpack component not found on the same GameObject.");
+        }
 
         ChangeState(PlayerState.Active);
     }
 
     private void OnEnable()
     {
-        // playerController.OnInteract += ItemInteractionHandler;
+        playerController.OnInteract += ItemInteractionPickupHandler;
     }
 
     private void OnDisable()
     {
-        // playerController.OnInteract -= ItemInteractionHandler;
+        playerController.OnInteract -= ItemInteractionPickupHandler;
 
         // Transition to the Inactive state
         ChangeState(PlayerState.Inactive);
@@ -75,30 +75,33 @@ public class Player : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        NotificationManager.Instance.ShowNotification("Press 'F' to interact!");
+        // NotificationManager.Instance.ShowNotification("Press 'F' to interact!");
 
-        ItemDistributor itemDistributor = other.gameObject.GetComponent<ItemDistributor>();
-        if (itemDistributor != null)
+        ItemInterestPoint interestPoint = other.gameObject.GetComponent<ItemInterestPoint>();
+        if (interestPoint != null && interestPoint.InterestPointType == ItemInterestPointType.Distributor)
         {
-            itemDistributor.OnItemSpawn += ItemDistributionSpawnHandler;
+            interestPoint.OnItemSpawn += ItemInteractionPickupHandler;
+        }
+        if (interestPoint != null && interestPoint.InterestPointType == ItemInterestPointType.Collector)
+        {
+            interestPoint.OnItemCollect += ItemInteractionDropHandler;
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        ItemDistributor itemDistributor = other.gameObject.GetComponent<ItemDistributor>();
-        if (itemDistributor != null)
+        ItemInterestPoint interestPoint = other.gameObject.GetComponent<ItemInterestPoint>();
+        if (interestPoint != null && interestPoint.InterestPointType == ItemInterestPointType.Distributor)
         {
-            itemDistributor.OnItemSpawn -= ItemDistributionSpawnHandler;
+            interestPoint.OnItemSpawn -= ItemInteractionPickupHandler;
+        }
+        if (interestPoint != null && interestPoint.InterestPointType == ItemInterestPointType.Collector)
+        {
+            interestPoint.OnItemCollect -= ItemInteractionDropHandler;
         }
     }
 
-    private void ItemDistributionSpawnHandler()
-    {
-        Debug.Log($"Item Spawn Recorded");
-    }
-
-    private void ItemInteractionHandler(GameObject obj)
+    private void ItemInteractionPickupHandler(GameObject obj)
     {
         if (backpack != null)
         {
@@ -107,6 +110,15 @@ public class Player : MonoBehaviour
         else
         {
             PickBackPack(obj);
+        }
+    }
+
+    private void ItemInteractionDropHandler()
+    {
+        if (backpack != null)
+        {
+            Debug.Log($"Item drop request");
+            backpack.RemoveItem();
         }
     }
 
@@ -144,6 +156,20 @@ public class Player : MonoBehaviour
                     else
                     {
                         string msg = $"Weapon already Equipped. Cannot equip weapon: {item.ItemName}";
+                        NotificationManager.Instance.ShowNotification(msg);
+                    }
+                    break;
+                case ItemType.DeliveryItem:
+                    // Attempt to pick up the item and stack it to the backpack
+                    bool itemPicked = backpack.AddItem(item, true);
+                    if (itemPicked)
+                    {
+                        string msg = $"Picked up item: {item.ItemName}";
+                        NotificationManager.Instance.ShowNotification(msg);
+                    }
+                    else
+                    {
+                        string msg = $"Backpack is full. Cannot pick up item: {item.ItemName}";
                         NotificationManager.Instance.ShowNotification(msg);
                     }
                     break;

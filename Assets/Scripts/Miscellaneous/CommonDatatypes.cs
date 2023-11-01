@@ -10,10 +10,23 @@ public enum PlayerState
     None
 }
 
+public enum PlayerMovementState
+{
+    Idle,
+    Walking,
+}
+
 public enum ItemType
 {
     WeaponItem,
     HealingItem,
+    DeliveryItem
+}
+
+public enum ItemInterestPointType
+{
+    Distributor,
+    Collector
 }
 
 public enum HealingAidType
@@ -33,4 +46,12 @@ public class EnvironmentObject
 {
     public GameObject spawnObject;
     public int count;
+}
+
+public enum InputDirection
+{
+    Up,
+    Right,
+    Down,
+    Left
 }
