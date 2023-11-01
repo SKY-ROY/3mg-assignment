@@ -9,7 +9,6 @@ public class InputController : MonoBehaviour
     // Define events for various actions
     public Action<float, float> OnHorizontalMovement;
     public event Action OnJump;
-    public event Action<GameObject> OnInteract;
     public event Action<bool> OnInfoDisplay;
     public event Action<BaseItem> OnItemPick;
     public event Action<BaseItem> OnItemUse;

@@ -5,8 +5,6 @@ using System;
 public class Player : MonoBehaviour
 {
     [SerializeField] GameObject backpackHolder;
-    [SerializeField] GameObject itemHolder;
-
     private PlayerMovementController playerController;
     private Backpack backpack; // Reference to the player's backpack
     public Backpack BackPack => backpack;
@@ -14,7 +12,6 @@ public class Player : MonoBehaviour
 
     // Event to notify about player state changes
     public event Action<PlayerState> OnPlayerStateChanged;
-    public event Action<PlayerMovementState> OnPlayerMovementStateChanged;
 
     private void Awake()
     {

@@ -23,7 +23,7 @@ public class ItemInterestPoint : MonoBehaviour
             playerInside = true;
             Backpack backpack = other.gameObject.GetComponent<Player>().BackPack;
             Debug.Log("Spawn Cycle started");
-            StartCoroutine(StartTiming(1f, backpack));
+            StartCoroutine(StartTimer(1f, backpack));
         }
     }
 
@@ -33,11 +33,11 @@ public class ItemInterestPoint : MonoBehaviour
         {
             playerInside = false;
             Debug.Log("Spawn Cycle stopped");
-            StopCoroutine(nameof(StartTiming));
+            StopCoroutine(nameof(StartTimer));
         }
     }
 
-    private IEnumerator StartTiming(float interval, Backpack assignedBackpack = null)
+    private IEnumerator StartTimer(float interval, Backpack assignedBackpack = null)
     {
         float timer = 0f;
         canvas.SetActive(true);

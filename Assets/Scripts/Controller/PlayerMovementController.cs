@@ -3,23 +3,18 @@ using UnityEngine;
 
 public class PlayerMovementController : MonoBehaviour
 {
+    [SerializeField] GameObject avatar; // The avatar GameObject to rotate
+    [SerializeField] Animator avatarAnimator;
     [SerializeField] InputController inputController;
+    [SerializeField] float moveSpeed = 5.0f;
+    [SerializeField] float jumpForce = 8.0f;
+    [SerializeField] float gravity = 20.0f;
+
     private CharacterController characterController;
-    private Transform cameraTransform;
-
-    public float moveSpeed = 5.0f;
-    public float jumpForce = 8.0f;
-    public float gravity = 20.0f;
-
     private PlayerMovementState currentMovementState;
-    private Vector3 moveDirection = Vector3.zero;
 
     public Action<GameObject> OnInteract;
     public Action<PlayerMovementState> OnPlayerMovementStateChanged;
-
-    public GameObject avatar; // The avatar GameObject to rotate
-    [SerializeField] private Animator animator;
-
 
     // Use this method for initialization
     public void Initialize()
@@ -36,9 +31,6 @@ public class PlayerMovementController : MonoBehaviour
             Debug.LogError("CharacterController component not found on the same GameObject.");
         }
 
-        // Assuming the camera is a child of the player or follows the player's rotation
-        cameraTransform = Camera.main.transform;
-
         // ChangeMovementState(PlayerMovementState.Idle);
     }
 
@@ -48,8 +40,6 @@ public class PlayerMovementController : MonoBehaviour
         if (inputController != null)
         {
             inputController.OnHorizontalMovement += HandleHorizontalMovement;
-            // inputController.OnJump += HandleJump;
-            // inputController.OnInteract += HandleInteract;
         }
     }
 
@@ -59,21 +49,8 @@ public class PlayerMovementController : MonoBehaviour
         if (inputController != null)
         {
             inputController.OnHorizontalMovement -= HandleHorizontalMovement;
-            // inputController.OnJump -= HandleJump;
-            // inputController.OnInteract -= HandleInteract;
         }
     }
-
-    // private void Update()
-    // {
-    //     if (!characterController.isGrounded)
-    //     {
-    //         moveDirection.y -= gravity * Time.deltaTime;
-    //     }
-
-    //     // Move the character
-    //     characterController.Move(moveDirection * Time.deltaTime);
-    // }
 
     private void HandleHorizontalMovement(float moveHorizontal, float moveVertical)
     {
@@ -105,25 +82,6 @@ public class PlayerMovementController : MonoBehaviour
         }
     }
 
-    // private void HandleJump()
-    // {
-    //     Debug.Log("Jump Input Received");
-    //     Debug.Log($"grounded: {characterController.isGrounded}");
-    //     // Check if the character is grounded before jumping
-    //     if (characterController.isGrounded)
-    //     {
-    //         // Apply jump force to the character
-    //         moveDirection.y = jumpForce;
-    //     }
-    // }
-
-    // private void HandleInteract(GameObject obj)
-    // {
-    //     // Implement your interact logic here
-    //     Debug.Log("Player is interacting with an item.");
-    //     OnInteract?.Invoke(obj);
-    // }
-
     private void ChangeMovementState(PlayerMovementState newState)
     {
         currentMovementState = newState;
@@ -132,10 +90,10 @@ public class PlayerMovementController : MonoBehaviour
         switch (currentMovementState)
         {
             case PlayerMovementState.Idle:
-                animator.SetTrigger("idle");
+                avatarAnimator.SetTrigger("idle");
                 break;
             case PlayerMovementState.Walking:
-                animator.SetTrigger("walk");
+                avatarAnimator.SetTrigger("walk");
                 break;
         }
 

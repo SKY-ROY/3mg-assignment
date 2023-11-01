@@ -10,7 +10,7 @@ public class Backpack : MonoBehaviour
     private InputController inputController;
 
     // Maximum number of items that the backpack can hold (excluding weapons)
-    public int maxCapacity = 10;
+    [SerializeField] int maxCapacity = 10;
 
     // Propert to check if the backpack is full (excluding weapons)
     public bool IsFull => items.Count >= maxCapacity;
