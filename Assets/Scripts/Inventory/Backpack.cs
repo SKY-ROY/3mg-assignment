@@ -18,15 +18,9 @@ public class Backpack : MonoBehaviour
     // List to store the items in the backpack (excluding weapons)
     private List<BaseItem> items = new List<BaseItem>();
 
-    // Weapon slot to hold one weapon
-    private Weapon weaponSlot;
-
     public static Action<BaseItem> OnItemAdd;
     public static Action<BaseItem> OnItemUse;
     public static Action<BaseItem> OnItemRemove;
-    public static Action<Weapon> OnWeaponEquip;
-    public static Action<Weapon> OnWeaponUnequip;
-    public static Action<bool> OnShowBackpackInfo;
 
     void Awake()
     {
@@ -37,20 +31,12 @@ public class Backpack : MonoBehaviour
     {
         inputController.OnItemUse += UseItem;
         inputController.OnItemDrop += RemoveItem;
-        inputController.OnWeaponCharge += ChargeWeapon;
-        inputController.OnWeaponDrop += UnequipWeapon;
-        inputController.OnPrimaryFire += UseWeapon;
-        inputController.OnInfoDisplay += ShowBackPackInfoScreen;
     }
 
     void OnDisable()
     {
         inputController.OnItemUse -= UseItem;
         inputController.OnItemDrop -= RemoveItem;
-        inputController.OnWeaponCharge -= ChargeWeapon;
-        inputController.OnWeaponDrop -= UnequipWeapon;
-        inputController.OnPrimaryFire -= UseWeapon;
-        inputController.OnInfoDisplay -= ShowBackPackInfoScreen;
     }
 
     public void Initialize()
@@ -157,81 +143,6 @@ public class Backpack : MonoBehaviour
         else
         {
             Debug.LogWarning("Item " + item.ItemName + " not found in the backpack.");
-        }
-    }
-
-    //   Method to Use Weapon for attacking
-    public void UseWeapon()
-    {
-        if (weaponSlot != null)
-        {
-            weaponSlot.Attack();
-        }
-    }
-
-    //   Method to Charge Weapon for stronger attacks
-    public void ChargeWeapon(Weapon weapon)
-    {
-        // Weapon Charging implementation
-        if (!weapon.isCharged)
-        {
-            weapon.Charge();
-        }
-    }
-
-    // Method to equip a weapon in the weapon slot
-    public bool EquipWeapon(Weapon newWeapon)
-    {
-        if (weaponSlot == null)
-        {
-            weaponSlot = newWeapon;
-
-            newWeapon.Initialize();
-            newWeapon.RefreshState(true);
-
-            OnWeaponEquip?.Invoke(newWeapon);
-
-            string msg = $"Equipped weapon: {newWeapon.ItemName}";
-            NotificationManager.Instance.ShowNotification(msg);
-
-            return true;
-        }
-        else
-        {
-            string msg = $"A weapon is already equipped. Unequip it first.";
-            NotificationManager.Instance.ShowNotification(msg);
-
-            return false;
-        }
-    }
-
-    // Method to unequip the currently equipped weapon
-    public void UnequipWeapon(Weapon weapon)
-    {
-        if (weaponSlot != null)
-        {
-            weaponSlot = null;
-            weapon.RefreshState(false);
-
-            OnWeaponUnequip?.Invoke(weapon);
-
-            string msg = $"Unequipped weapon: {weapon.ItemName}";
-            NotificationManager.Instance.ShowNotification(msg);
-
-            ProcessDroppedItem(weapon, false);
-        }
-        else
-        {
-            Debug.LogWarning("No weapon is currently equipped.");
-        }
-    }
-
-    // Display Backpack Info Screen
-    void ShowBackPackInfoScreen(bool arg)
-    {
-        if (isInitialized)
-        {
-            OnShowBackpackInfo?.Invoke(arg);
         }
     }
 

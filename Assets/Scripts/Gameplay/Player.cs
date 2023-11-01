@@ -5,7 +5,6 @@ using System;
 public class Player : MonoBehaviour
 {
     [SerializeField] GameObject backpackHolder;
-    [SerializeField] GameObject weaponHolder;
     [SerializeField] GameObject itemHolder;
 
     private PlayerMovementController playerController;
@@ -52,12 +51,12 @@ public class Player : MonoBehaviour
 
     private void OnEnable()
     {
-        playerController.OnInteract += ItemInteractionPickupHandler;
+        playerController.OnInteract += PickupItemInteractionHandler;
     }
 
     private void OnDisable()
     {
-        playerController.OnInteract -= ItemInteractionPickupHandler;
+        playerController.OnInteract -= PickupItemInteractionHandler;
 
         // Transition to the Inactive state
         ChangeState(PlayerState.Inactive);
@@ -80,11 +79,11 @@ public class Player : MonoBehaviour
         ItemInterestPoint interestPoint = other.gameObject.GetComponent<ItemInterestPoint>();
         if (interestPoint != null && interestPoint.InterestPointType == ItemInterestPointType.Distributor)
         {
-            interestPoint.OnItemSpawn += ItemInteractionPickupHandler;
+            interestPoint.OnItemSpawn += PickupItemInteractionHandler;
         }
         if (interestPoint != null && interestPoint.InterestPointType == ItemInterestPointType.Collector)
         {
-            interestPoint.OnItemCollect += ItemInteractionDropHandler;
+            interestPoint.OnItemCollect += DropItemInteractionHandler;
         }
     }
 
@@ -93,15 +92,15 @@ public class Player : MonoBehaviour
         ItemInterestPoint interestPoint = other.gameObject.GetComponent<ItemInterestPoint>();
         if (interestPoint != null && interestPoint.InterestPointType == ItemInterestPointType.Distributor)
         {
-            interestPoint.OnItemSpawn -= ItemInteractionPickupHandler;
+            interestPoint.OnItemSpawn -= PickupItemInteractionHandler;
         }
         if (interestPoint != null && interestPoint.InterestPointType == ItemInterestPointType.Collector)
         {
-            interestPoint.OnItemCollect -= ItemInteractionDropHandler;
+            interestPoint.OnItemCollect -= DropItemInteractionHandler;
         }
     }
 
-    private void ItemInteractionPickupHandler(GameObject obj)
+    private void PickupItemInteractionHandler(GameObject obj)
     {
         if (backpack != null)
         {
@@ -113,7 +112,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void ItemInteractionDropHandler()
+    private void DropItemInteractionHandler()
     {
         if (backpack != null)
         {
@@ -130,35 +129,6 @@ public class Player : MonoBehaviour
         {
             switch (item.ItemType)
             {
-                case ItemType.HealingItem:
-                    // Attempt to pick up the item and add it to the backpack
-                    bool pickedUp = backpack.AddItem(item);
-                    if (pickedUp)
-                    {
-                        string msg = $"Picked up item: {item.ItemName}";
-                        NotificationManager.Instance.ShowNotification(msg);
-
-                        // You can add more logic here, such as playing a sound, disabling the item in the scene, etc.
-                        SetPickedObjectOrientation(pickUpObject, itemHolder.transform);
-                    }
-                    else
-                    {
-                        string msg = $"Backpack is full. Cannot pick up item: {item.ItemName}";
-                        NotificationManager.Instance.ShowNotification(msg);
-                    }
-                    break;
-                case ItemType.WeaponItem:
-                    bool equipped = backpack.EquipWeapon((Weapon)item);
-                    if (equipped)
-                    {
-                        SetPickedObjectOrientation(pickUpObject, weaponHolder.transform);
-                    }
-                    else
-                    {
-                        string msg = $"Weapon already Equipped. Cannot equip weapon: {item.ItemName}";
-                        NotificationManager.Instance.ShowNotification(msg);
-                    }
-                    break;
                 case ItemType.DeliveryItem:
                     // Attempt to pick up the item and stack it to the backpack
                     bool itemPicked = backpack.AddItem(item, true);

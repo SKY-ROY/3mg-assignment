@@ -36,11 +36,6 @@ public class PlayerMovementController : MonoBehaviour
             Debug.LogError("CharacterController component not found on the same GameObject.");
         }
 
-        // if (avatar != null)
-        // {
-        //     animator = avatar.GetComponent<Animator>();
-        // }
-
         // Assuming the camera is a child of the player or follows the player's rotation
         cameraTransform = Camera.main.transform;
 
@@ -53,8 +48,8 @@ public class PlayerMovementController : MonoBehaviour
         if (inputController != null)
         {
             inputController.OnHorizontalMovement += HandleHorizontalMovement;
-            inputController.OnJump += HandleJump;
-            inputController.OnInteract += HandleInteract;
+            // inputController.OnJump += HandleJump;
+            // inputController.OnInteract += HandleInteract;
         }
     }
 
@@ -64,27 +59,21 @@ public class PlayerMovementController : MonoBehaviour
         if (inputController != null)
         {
             inputController.OnHorizontalMovement -= HandleHorizontalMovement;
-            inputController.OnJump -= HandleJump;
-            inputController.OnInteract -= HandleInteract;
+            // inputController.OnJump -= HandleJump;
+            // inputController.OnInteract -= HandleInteract;
         }
     }
 
-    private void Update()
-    {
-        // Apply gravity to the character
-        //if (characterController.isGrounded)
-        //{
-        //    moveDirection.y = 0; // Reset vertical velocity if grounded
-        //}
-        //else
-        if (!characterController.isGrounded)
-        {
-            moveDirection.y -= gravity * Time.deltaTime;
-        }
+    // private void Update()
+    // {
+    //     if (!characterController.isGrounded)
+    //     {
+    //         moveDirection.y -= gravity * Time.deltaTime;
+    //     }
 
-        // Move the character
-        characterController.Move(moveDirection * Time.deltaTime);
-    }
+    //     // Move the character
+    //     characterController.Move(moveDirection * Time.deltaTime);
+    // }
 
     private void HandleHorizontalMovement(float moveHorizontal, float moveVertical)
     {
@@ -116,24 +105,24 @@ public class PlayerMovementController : MonoBehaviour
         }
     }
 
-    private void HandleJump()
-    {
-        Debug.Log("Jump Input Received");
-        Debug.Log($"grounded: {characterController.isGrounded}");
-        // Check if the character is grounded before jumping
-        if (characterController.isGrounded)
-        {
-            // Apply jump force to the character
-            moveDirection.y = jumpForce;
-        }
-    }
+    // private void HandleJump()
+    // {
+    //     Debug.Log("Jump Input Received");
+    //     Debug.Log($"grounded: {characterController.isGrounded}");
+    //     // Check if the character is grounded before jumping
+    //     if (characterController.isGrounded)
+    //     {
+    //         // Apply jump force to the character
+    //         moveDirection.y = jumpForce;
+    //     }
+    // }
 
-    private void HandleInteract(GameObject obj)
-    {
-        // Implement your interact logic here
-        Debug.Log("Player is interacting with an item.");
-        OnInteract?.Invoke(obj);
-    }
+    // private void HandleInteract(GameObject obj)
+    // {
+    //     // Implement your interact logic here
+    //     Debug.Log("Player is interacting with an item.");
+    //     OnInteract?.Invoke(obj);
+    // }
 
     private void ChangeMovementState(PlayerMovementState newState)
     {
